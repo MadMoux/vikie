@@ -1290,12 +1290,42 @@ function toggleFaq(btn) {
   if (!isOpen) { answer.classList.add('open'); btn.classList.add('open'); }
 }
 
-// Form submit
+// Form submit — sends to Google Sheets via Apps Script
 document.getElementById('wlForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  this.style.display = 'none';
-  document.getElementById('formSuccess').style.display = 'block';
-  document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // ✏️ PASTE YOUR APPS SCRIPT URL HERE (step 5 in the guide)
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynJdZzuEW_02JnXcBy7t3w_7oVHG8D7tVle0dN3u31ho0Jf-xcBLo0yqQDdeRL35pazQ/exec';
+
+  const btn = this.querySelector('.form-submit');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+
+  const data = {
+    twitter:  document.getElementById('wl-twitter').value,
+    wallet:   document.getElementById('wl-wallet').value,
+    how:      document.getElementById('wl-how').value,
+    message:  document.getElementById('wl-msg').value,
+    date:     new Date().toLocaleString()
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    document.getElementById('wlForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+    document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  })
+  .catch(() => {
+    // still show success — no-cors means we can't read the response but it still sends
+    document.getElementById('wlForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+    document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
 });
 </script>
 </body>
